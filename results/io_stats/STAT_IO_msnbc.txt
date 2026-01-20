@@ -1,0 +1,16 @@
+input_file: data/msnbc.spmf
+num_sequences_D: 989818
+num_transactions_T: 4698794
+num_distinct_items_I: 17
+
+transactions_per_sequence:
+  min: 1
+  max: 14795
+  mean: 4.747129
+  std: 21.257378
+
+items_per_transaction:
+  min: 1
+  max: 1
+  mean: 1.000000
+  std: 0.000000

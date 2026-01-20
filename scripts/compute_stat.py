@@ -1,6 +1,6 @@
 from __future__ import annotations
 import argparse
-from spade.io import read_csv
+from spade.io import read_csv, read_spmf
 from spade.stats import compute_input_stats
 
 def main():
@@ -9,7 +9,12 @@ def main():
     ap.add_argument("--out", required=False, help="Output STAT file path")
     args = ap.parse_args()
 
-    records = read_csv(args.input)
+    if args.input.endswith(".csv"):
+        records = read_csv(args.input)
+    elif args.input.endswith(".spmf") or args.input.endswith(".spm"):
+        records = read_spmf(args.input)
+    else:
+        raise ValueError("Unsupported input format")
     st = compute_input_stats(records, filename=args.input)
 
     lines = []
