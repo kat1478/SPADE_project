@@ -1,69 +1,85 @@
-# SPADE-like Sequential Pattern Mining (dSPADE / bSPADE / maxElts-\*)
+# SPADE-like Sequential Pattern Mining
 
-This repository contains a Python implementation of SPADE-like frequent sequential pattern mining:
+A Python implementation of frequent sequential pattern mining algorithms based on the SPADE framework.
 
-- **dSPADE** (depth-first search)
-- **bSPADE** (breadth-first search)
-- **maxElts-dSPADE** (DFS with a limit on the number of elements in an event)
-- **maxElts-bSPADE** (BFS with a limit on the number of elements in an event)
+## What's included
 
-The project produces two output files per experiment:
+This repository contains four mining algorithms:
 
-- **OUT\_\*.txt** (discovered patterns in discovery order)
-- **STAT\_\*.txt** (dataset statistics + timing + counters)
+- **dSPADE** — depth-first search variant
+- **bSPADE** — breadth-first search variant
+- **maxElts-dSPADE** — DFS with a configurable limit on event size
+- **maxElts-bSPADE** — BFS with a configurable limit on event size
 
-Reference:
+For each experiment, the implementation produces two output files:
 
-> Mohammed J. Zaki, "SPADE: An Efficient Algorithm for Mining Frequent Sequences", Machine Learning 42(1), 2001.
+- `OUT_*.txt` — discovered patterns in order of discovery
+- `STAT_*.txt` — dataset statistics, runtime metrics, and counters
+
+The algorithms follow the core ideas from:
+
+> Zaki, M. J. (2001). "SPADE: An Efficient Algorithm for Mining Frequent Sequences." _Machine Learning_, 42(1), 31–60.
 
 ---
 
-## 1) Requirements
+## Getting started
 
-### Python
+### Requirements
 
-- Recommended: **Python 3.10** (tested)
-- Works with: Python 3.9+ (should)
+- **Python 3.10** or later (tested with 3.10)
+- Linux, macOS, WSL, or Windows
 
-Check:
+Check your Python version:
 
 ```bash
 python --version
 ```
 
-### OS
+### Installation
 
-Tested on Linux/WSL. Should work on macOS/Windows (with Python 3.10+).
+Set up a Python virtual environment from the repository root:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate        # Linux / macOS / WSL
+# .venv\Scripts\activate         # Windows (PowerShell)
+
+python -m pip install -U pip
+python -m pip install -r requirements.txt
+```
+
+If `requirements.txt` is not available, install the minimum dependencies manually:
+
+```bash
+python -m pip install pytest matplotlib
+```
+
+**Note:** Always activate your virtual environment before running scripts or tests. On systems with mixed `~/.local` and virtual environment packages, this becomes crucial.
 
 ---
 
-## 2) Installation
+## Project layout
 
-```bash
-python -m pip install pytest
-python -m pip install matplotlib
+```
+spade/              Core library — I/O, tidlists, joins, pattern representation, algorithms
+scripts/            Runnable utilities for experiments, statistics, and plotting
+tests/              Unit tests for validation
+data/               Input datasets in SPMF format
+plots/              Generated charts (PNG)
+results*/           Experimental results (OUT and STAT files)
 ```
 
 ---
 
-## 3) Project structure
+## Input formats
 
-- `spade/` – core library (I/O, tidlists, joins, pattern representation, mining algorithms)
-- `scripts/` – runnable CLI utilities (experiments, statistics, plots)
-- `tests/` – unit tests (toy dataset validation)
-- `data/` – datasets (toy + real datasets in SPMF format)
-- `results*/` – generated results (OUT/STAT)
-- `plots/` – generated charts
+### SPMF format (.spmf, .spm)
 
----
+The standard sequential pattern mining format:
 
-## 4) Input data formats
-
-### 4.1 SPMF format (`.spmf`, `.spm`)
-
-- Items separated by spaces
-- `-1` ends an event (transaction)
-- `-2` ends a sequence
+- Items are space-separated
+- `-1` marks the end of an event (transaction)
+- `-2` marks the end of a sequence
 
 Example:
 
@@ -72,46 +88,42 @@ Example:
 1 -1 2 3 -1 -2
 ```
 
-### 4.2 CSV (toy dataset)
+### CSV format (toy dataset)
 
-A small toy dataset can be provided as CSV. The CSV reader expects a specific header
-(e.g., `sid`, etc.). See `spade/io.py` and the toy file in `data/`.
+For smaller datasets, CSV input is supported. The file should include columns like `sid` (sequence ID), `eid` (event ID), and item columns. See `data/toy_spade.csv` and `spade/io.py` for details.
 
 ---
 
-## 5) Outputs
+## Output files
 
-### 5.1 OUT file (`OUT_*.txt`)
+### OUT\_\*.txt — Discovered patterns
 
-Each discovered frequent pattern is written in a separate line, in discovery order:
+Each line represents one frequent pattern, in discovery order:
 
-- pattern length (positions)
-- number of elements
-- tidlist length
-- support (`sup`)
-- the pattern (human-readable)
+```
+<pattern_length> <element_count> <tidlist_length> <support> <human_readable_pattern>
+```
 
-Example line:
+Example:
 
 ```
 2 2 3 2 <{B}->{A}>
 ```
 
-### 5.2 STAT file (`STAT_*.txt`)
+### STAT\_\*.txt — Statistics and timing
 
-Contains:
+Contains comprehensive experiment metadata:
 
-- dataset stats (`D`, `T`, `I`, min/max/mean/std)
-- parameters (`sup`, optional `maxElts`, algorithm name)
-- partial times: reading, mining, writing
-- total times (including and excluding read)
-- counters: candidates, discovered patterns, per-length breakdown
+- Dataset statistics: number of sequences (D), transactions (T), items (I), and distribution metrics
+- Algorithm parameters: minimum support, optional maxElts limit, algorithm name
+- Execution times: reading, mining, writing, and total times
+- Performance counters: candidates explored, patterns discovered, max pattern length
 
 ---
 
-## 6) User manual (how to run)
+## Running experiments
 
-### 6.1 Dataset statistics only
+### Compute dataset statistics only
 
 ```bash
 python -m scripts.compute_stat --input data/msnbc.spmf --out STAT_IO_msnbc.txt
@@ -119,32 +131,34 @@ python -m scripts.compute_stat --input data/bike.spmf  --out STAT_IO_bike.txt
 python -m scripts.compute_stat --input data/covid.spmf --out STAT_IO_covid.txt
 ```
 
-### 6.2 Run a single experiment (OUT + STAT)
+### Run a single mining task
 
-Main entry point:
+Use the main entry point `scripts.run_and_stat`:
 
-**Base algorithms**
+**Base algorithms:**
 
 ```bash
 python -m scripts.run_and_stat --input data/msnbc.spmf --alg dspade --sup 200000 --resultsDir results_final
 python -m scripts.run_and_stat --input data/msnbc.spmf --alg bspade --sup 200000 --resultsDir results_final
 ```
 
-**maxElts algorithms**
+**With maxElts constraint:**
 
 ```bash
 python -m scripts.run_and_stat --input data/msnbc.spmf --alg maxelts-dspade --sup 200000 --maxElts 2 --resultsDir results_final
 python -m scripts.run_and_stat --input data/msnbc.spmf --alg maxelts-bspade --sup 200000 --maxElts 2 --resultsDir results_final
 ```
 
-The script prints paths to generated files, e.g.:
+The script prints the paths to generated files:
 
-- `OUT_maxelts-dspade_msnbc_d..._s200000_e2.txt`
-- `STAT_maxelts-dspade_msnbc_d..._s200000_e2.txt`
+```
+OUT_maxelts-dspade_msnbc_d..._s200000_e2.txt
+STAT_maxelts-dspade_msnbc_d..._s200000_e2.txt
+```
 
-### 6.3 Run a parameter grid (multiple sups / maxElts)
+### Run a parameter sweep
 
-**Full grid (base + maxElts variants)**
+**Grid search — all algorithms:**
 
 ```bash
 python -m scripts.run_grid \
@@ -154,7 +168,7 @@ python -m scripts.run_grid \
   --maxElts 2,3
 ```
 
-**maxElts-only grid**
+**Grid search — maxElts variants only:**
 
 ```bash
 python -m scripts.run_grid_maxelts \
@@ -166,48 +180,50 @@ python -m scripts.run_grid_maxelts \
 
 ---
 
-## 7) Correctness checks
+## Validation
 
-### 7.1 Unit tests (toy dataset)
+### Run the test suite
 
 ```bash
 pytest -q
 ```
 
-Expected: all tests pass.
+All tests should pass. The test suite uses a small toy dataset to validate correctness.
 
-### 7.2 Consistency checks (recommended)
+### Consistency checks
 
-For a fixed `sup`:
+For reproducibility, verify that:
 
-- dSPADE and bSPADE should discover the same set of patterns (order may differ).
-- maxElts variants should be consistent with base variants when `maxElts` does not restrict patterns.
+- **dSPADE and bSPADE** discover the same set of patterns (though order may differ) for a fixed support threshold.
+- **maxElts variants** produce results consistent with the base algorithm when the element limit is not restrictive.
+
+A practical approach is to extract and compare pattern strings from output files as sets.
 
 ---
 
-## 8) Plotting
+## Generating plots
 
-If `matplotlib` is installed:
+If matplotlib is installed:
 
 ```bash
 python -m scripts.make_plots
 ```
 
-Plots are saved under `plots/` (PNG).
+Charts are saved to the `plots/` directory as PNG files.
 
 ---
 
-## 9) Troubleshooting
+## Troubleshooting
 
-### 9.1 `ModuleNotFoundError: No module named 'matplotlib'`
+**"No module named 'matplotlib'"**
 
-Install it into the active environment:
+Install matplotlib into your active environment:
 
 ```bash
 python -m pip install matplotlib
 ```
 
-### 9.2 Errors like `No module named 'six'` / `pyparsing`
+**"No module named 'six'" or other missing packages**
 
 Install missing dependencies:
 
@@ -215,13 +231,26 @@ Install missing dependencies:
 python -m pip install six pyparsing python-dateutil
 ```
 
-### 9.3 `KeyError: 'sid'` when running `compute_stat`
+**"KeyError: 'sid'" when running compute_stat**
 
-This usually happens when the CSV reader is used on a non-CSV file.
-Make sure you pass a `.csv` file with the expected header, or use `.spmf` input.
+This occurs when the CSV reader is applied to a non-CSV file. Make sure to:
+
+- Use `.csv` input for the CSV reader
+- Use `.spmf` input for SPMF datasets
+- Verify the CSV file has the expected header columns
 
 ---
 
-## 10) Citation
+## Best practices
 
-- M. J. Zaki, "SPADE: An Efficient Algorithm for Mining Frequent Sequences", Machine Learning 42(1), 2001.
+- **Keep experiment records:** Save the `STAT_*.txt` and `OUT_*.txt` files for each run. Filenames encode the dataset, parameters, and statistics, making results traceable and reproducible.
+- **Activate your environment:** Always ensure `.venv` is active before running scripts.
+- **Test locally first:** Use the toy dataset (small and fast) to validate your setup before running on larger datasets.
+
+---
+
+## Citation
+
+If you use this implementation in research, please cite:
+
+Zaki, M. J. (2001). SPADE: An Efficient Algorithm for Mining Frequent Sequences. _Machine Learning_, 42(1), 31–60.
