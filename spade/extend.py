@@ -8,12 +8,12 @@ def last_event(p: Pattern) -> Event:
     return p[-1]
 
 def make_i_extension(p: Pattern, item: str) -> Pattern:
-    # dodaj item do ostatniego eventu (I-step)
+    # add item to the last event (I-step)
     ev = tuple(sorted(set(last_event(p) + (item,))))
     return p[:-1] + (ev,)
 
 def make_s_extension(p: Pattern, item: str) -> Pattern:
-    # dodaj nowy event na końcu (S-step)
+    # add new event with item (S-step)
     return p + ((item,),)
 
 def extend_node(
@@ -23,16 +23,15 @@ def extend_node(
     minsup: int,
 ) -> List[Tuple[Pattern, List[Tid]]]:
     """
-    Zwraca listę (new_pattern, new_tidlist) w deterministycznej kolejności:
-    najpierw I-step (itemy większe leksykograficznie od ostatniego itemu last_event),
-    potem S-step (wszystkie itemy leksykograficznie).
+    Returns a list of (new_pattern, new_tidlist) in deterministic order:
+    first I-steps (adding item to last event), then S-steps (adding new event with item).
     """
     out: List[Tuple[Pattern, List[Tid]]] = []
 
     last_ev = last_event(pattern)
-    last_max_item = last_ev[-1]  # bo event jest posortowany
+    last_max_item = last_ev[-1]  # because events are sorted tuples
 
-    # I-step: tylko itemy > last_max_item żeby uniknąć duplikatów (AB vs BA)
+    # I-step: only items > last_max_item to avoid duplicates (AB vs BA)
     for it in sorted(item_tidlists.keys()):
         if it <= last_max_item:
             continue
@@ -40,7 +39,7 @@ def extend_node(
         if support(new_tl) >= minsup:
             out.append((make_i_extension(pattern, it), new_tl))
 
-    # S-step: wszystkie itemy
+    # S-step: all items
     for it in sorted(item_tidlists.keys()):
         new_tl = s_join(tidlist, item_tidlists[it])
         if support(new_tl) >= minsup:
@@ -57,18 +56,18 @@ def extend_node_maxelts(
     max_elts: int,
 ) -> List[Tuple[Pattern, List[Tid]]]:
     """
-    Jak extend_node(), ale ucina generowanie rozszerzeń, które przekroczą max_elts.
+    Like extend_node, but respects max_elts constraint.
     """
     out: List[Tuple[Pattern, List[Tid]]] = []
 
     current_elts = sum(len(ev) for ev in pattern)
     if current_elts >= max_elts:
-        return out  # już nie wolno rozszerzać
+        return out  # no extensions possible
 
     last_ev = last_event(pattern)
     last_max_item = last_ev[-1]
 
-    # I-step: dodanie 1 elementu
+    # I-step: adding 1 element
     if current_elts + 1 <= max_elts:
         for it in sorted(item_tidlists.keys()):
             if it <= last_max_item:
@@ -77,7 +76,7 @@ def extend_node_maxelts(
             if support(new_tl) >= minsup:
                 out.append((make_i_extension(pattern, it), new_tl))
 
-    # S-step: dodanie nowego eventu z 1 elementem
+    # S-step: adding a new event with 1 element
     if current_elts + 1 <= max_elts:
         for it in sorted(item_tidlists.keys()):
             new_tl = s_join(tidlist, item_tidlists[it])

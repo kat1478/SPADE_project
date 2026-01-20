@@ -24,7 +24,7 @@ def test_maxelts_equals_unlimited_when_large():
     dfs = dspade(f1_nodes, item_tidlists, minsup=2)
     bfs = bspade(f1_nodes, item_tidlists, minsup=2)
 
-    # "duże" maxElts: na toy danych najwięcej elts to 4
+    # "large" maxElts: in the toy data, the maximum number of elements is 4
     md = maxelts_dspade(f1_nodes, item_tidlists, minsup=2, max_elts=999)
     mb = maxelts_bspade(f1_nodes, item_tidlists, minsup=2, max_elts=999)
 

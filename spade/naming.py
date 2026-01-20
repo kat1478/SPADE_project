@@ -12,12 +12,12 @@ class DataInfo:
 
 def dataset_info(input_path: str, D: int, T: int, I: int) -> DataInfo:
     p = Path(input_path)
-    # bierzemy nazwę bez rozszerzenia
+    # take the filename without extension
     fname = p.stem
     return DataInfo(fname=fname, D=D, T=T, I=I)
 
 def build_out_name(alg: str, info: DataInfo, sup: int, max_elts: Optional[int]) -> str:
-    # alg w stylu: dspade, bspade, maxelts-dspade, maxelts-bspade
+    # algorithm style: dspade, bspade, maxelts-dspade, maxelts-bspade
     base = f"OUT_{alg}_{info.fname}_d{info.D}_t{info.T}_i{info.I}_s{sup}"
     if max_elts is not None:
         base += f"_e{max_elts}"

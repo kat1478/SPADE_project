@@ -15,7 +15,7 @@ def index_by_sid(tidlist: List[Tid]) -> Dict[int, List[int]]:
 
 def i_join(t1: List[Tid], t2: List[Tid]) -> List[Tid]:
     """
-    I-step: ten sam event => przecięcie par (sid,eid)
+    I-step: same event => intersection of pairs (sid,eid)
     """
     s = set(t1)
     out = [x for x in t2 if x in s]
@@ -24,18 +24,18 @@ def i_join(t1: List[Tid], t2: List[Tid]) -> List[Tid]:
 
 def s_join(t1: List[Tid], t2: List[Tid]) -> List[Tid]:
     """
-    S-step: nowy event po starym.
-    Zwracamy (sid, eid2) takie, że istnieje eid1 z t1 dla tego sid i eid1 < eid2.
+    S-step: new event after old one.
+    Returns (sid, eid2) such that there exists an eid1 from t1 for the same sid and eid1 < eid2.
     """
     by1 = index_by_sid(t1)
     out: List[Tid] = []
 
-    # iterujemy po t2 w kolejności rosnącej
+    # iterate through t2 in ascending order
     for sid, eid2 in sorted(t2):
         eids1 = by1.get(sid)
         if not eids1:
             continue
-        # czy istnieje eid1 < eid2?
+        # does there exist eid1 < eid2?
         pos = bisect_left(eids1, eid2)
         if pos > 0:
             out.append((sid, eid2))

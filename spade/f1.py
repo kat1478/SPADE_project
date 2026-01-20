@@ -4,8 +4,8 @@ from .vertical import VerticalDB, support, Tid
 
 def frequent_items(vdb: VerticalDB, minsup: int) -> List[Tuple[str, List[Tid], int]]:
     """
-    Zwraca listę: (item, tidlist, sup) posortowaną alfabetycznie po item,
-    żeby wynik był deterministyczny.
+    Returns a list: (item, tidlist, sup) sorted alphabetically by item to ensure deterministic output.
+    
     """
     out = []
     for it in sorted(vdb.keys()):

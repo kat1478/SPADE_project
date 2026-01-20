@@ -36,7 +36,7 @@ class StatsCounter:
         self._inc(self.sum_sup_disc, k, node.sup)
         self._inc(self.sum_tid_disc, k, node.len_tidlist)
 
-    # pomocnicze sumy globalne
+    # auxiliary global sums
     def total_candidates(self) -> int:
         return sum(self.candidates_by_len.values())
 
@@ -64,19 +64,19 @@ def dspade(
     stats: StatsCounter | None = None,
 ) -> List[Node]:
     """
-    DFS enumeration. Zwraca listę odkrytych wzorców w kolejności odkrywania.
+    DFS enumeration. Returns a list of discovered patterns in the order of discovery.
     """
     discovered: List[Node] = []
 
     def dfs(node: Node):
-        # odkryty wzorzec (częsty) — zapisujemy
+        # discovered (frequent) — record/save
         discovered.append(node)
         if on_discover:
             on_discover(node)
         if stats:
             stats.add_discovered(node)
 
-        # generuj rozszerzenia
+        # generate extensions
         extensions = extend_node(node.pattern, node.tidlist, item_tidlists, minsup)
         for (p2, tl2) in extensions:
             child = Node(pattern=p2, tidlist=tl2)
@@ -84,10 +84,10 @@ def dspade(
                 stats.add_candidate(child)
             dfs(child)
 
-    # Start DFS z każdym częstym 1-wzorcem
+    # Start DFS with each frequent 1-pattern
     for n in f1_nodes:
         if stats:
-            stats.add_candidate(n)  # kandydat długości 1 też liczmy jako utworzony
+            stats.add_candidate(n)  # length-1 candidate is also counted as created
         dfs(n)
 
     return discovered

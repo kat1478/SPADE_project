@@ -15,11 +15,11 @@ def build_vertical_db(records: List[Record]) -> VerticalDB:
         for it in r.items:
             vdb[it].append((r.sid, r.eid))
 
-    # deterministycznie: sortujemy tidlisty
+    # deterministic output
     for it in vdb:
         vdb[it].sort()
     return dict(vdb)
 
 def support(tidlist: List[Tid]) -> int:
-    # liczba unikalnych sid
+    # number of distinct sids in the tidlist
     return len({sid for sid, _ in tidlist})

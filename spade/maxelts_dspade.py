@@ -22,7 +22,7 @@ def maxelts_dspade(
         if stats:
             stats.add_discovered(node)
 
-        # odcięcie jest w extend_node_maxelts
+        # cutoff is handled in extend_node_maxelts
         extensions = extend_node_maxelts(node.pattern, node.tidlist, item_tidlists, minsup, max_elts)
         for p2, tl2 in extensions:
             child = Node(pattern=p2, tidlist=tl2)
@@ -33,7 +33,7 @@ def maxelts_dspade(
     for n in f1_nodes:
         if stats:
             stats.add_candidate(n)
-        # jeśli już F1 przekracza max_elts (np. max_elts=0), to pomijamy
+        # if f1 already exceeds max_elts (e.g., max_elts=0), skip it
         if n.elts <= max_elts:
             dfs(n)
 

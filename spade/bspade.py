@@ -5,7 +5,7 @@ from .node import Node
 from .extend import extend_node
 from .vertical import Tid
 
-from .dspade import StatsCounter  # można współdzielić licznik
+from .dspade import StatsCounter  
 
 def bspade(
     f1_nodes: List[Node],
@@ -15,13 +15,13 @@ def bspade(
     stats: StatsCounter | None = None,
 ) -> List[Node]:
     """
-    BFS enumeration. Zwraca listę odkrytych wzorców w kolejności odkrywania.
+    BFS enumeration. Returns a list of discovered patterns in the order of discovery.
     """
     discovered: List[Node] = []
 
     q = deque()
 
-    # start: poziom 1
+    # start: level 1
     for n in f1_nodes:
         if stats:
             stats.add_candidate(n)
@@ -30,14 +30,14 @@ def bspade(
     while q:
         node = q.popleft()
 
-        # odkryty (częsty) — zapisujemy
+        # discovered (frequent) — record/save
         discovered.append(node)
         if on_discover:
             on_discover(node)
         if stats:
             stats.add_discovered(node)
 
-        # generuj dzieci i wrzuć do kolejki
+        # generate children and push to the queue
         extensions = extend_node(node.pattern, node.tidlist, item_tidlists, minsup)
         for p2, tl2 in extensions:
             child = Node(pattern=p2, tidlist=tl2)
