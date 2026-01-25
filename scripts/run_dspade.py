@@ -6,6 +6,8 @@ from spade.f1 import frequent_items
 from spade.node import Node
 from spade.dspade import dspade, StatsCounter
 from spade.pattern import format_pattern
+from spade.out_file import write_out, OutMeta
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -32,10 +34,11 @@ def main():
 
     text = "\n".join(lines)
     if args.out:
-        with open(args.out, "w", encoding="utf-8") as f:
-            f.write(text + "\n")
+        meta = OutMeta(alg="dspade", input_file=args.input, minsup=args.sup)
+        write_out(args.out, lines, meta=meta)
     else:
-        print(text)
+        print("\n".join(lines))
+
 
 if __name__ == "__main__":
     main()

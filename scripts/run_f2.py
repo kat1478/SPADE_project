@@ -5,6 +5,7 @@ from spade.vertical import build_vertical_db
 from spade.f1 import frequent_items
 from spade.f2 import gen_f2
 from spade.pattern import pattern_len, num_elts, format_pattern
+from spade.out_file import write_out, OutMeta
 
 def main():
     ap = argparse.ArgumentParser()
@@ -27,10 +28,11 @@ def main():
 
     text = "\n".join(lines)
     if args.out:
-        with open(args.out, "w", encoding="utf-8") as f:
-            f.write(text + "\n")
+        meta = OutMeta(alg="f2", input_file=args.input, minsup=args.sup)
+        write_out(args.out, lines, meta=meta)
     else:
-        print(text)
+        print("\n".join(lines))
+
 
 if __name__ == "__main__":
     main()

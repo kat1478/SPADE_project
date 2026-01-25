@@ -1,0 +1,16 @@
+input_file: data/wyklad.csv
+num_sequences_D: 4
+num_transactions_T: 10
+num_distinct_items_I: 8
+
+transactions_per_sequence:
+  min: 1
+  max: 4
+  mean: 2.500000
+  std: 1.118034
+
+items_per_transaction:
+  min: 1
+  max: 4
+  mean: 2.700000
+  std: 0.781025

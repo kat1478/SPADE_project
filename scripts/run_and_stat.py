@@ -18,6 +18,8 @@ from spade.maxelts_bspade import maxelts_bspade
 from spade.stat_file import write_stat
 from spade.naming import dataset_info, build_out_name, build_stat_name
 
+from spade.out_file import write_out, OutMeta
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -87,11 +89,37 @@ def main():
     stat_path = results_dir / stat_name
 
     t_write0 = time.perf_counter()
-    out_path.write_text("\n".join(out_lines) + "\n", encoding="utf-8")
-    t_write1 = time.perf_counter()
 
+    # STAT first (needs t_write timings too)
+    write_stat(
+        path=str(stat_path),
+        input_stats=input_stats,
+        alg_name=args.alg,
+        sup=args.sup,
+        max_elts=max_elts,
+        time_read_s=(t_read1 - t_read0),
+        time_mine_s=(t_mine1 - t_mine0),
+        time_write_s=0.0,  # temporary, overwritten below
+        total_time_s=0.0,  # temporary, overwritten below
+        stats_counter=stats,
+    )
+
+    # OUT (with header + meta)
+    meta = OutMeta(
+        alg=args.alg,
+        input_file=args.input,
+        minsup=args.sup,
+        max_elts=max_elts,
+        num_sequences=input_stats.num_sequences,
+        num_transactions=input_stats.num_transactions,
+        num_items=input_stats.num_distinct_items,
+    )
+    write_out(str(out_path), out_lines, meta=meta)
+
+    t_write1 = time.perf_counter()
     total_time = time.perf_counter() - t0
 
+    # overwrite STAT with correct write/total time
     write_stat(
         path=str(stat_path),
         input_stats=input_stats,

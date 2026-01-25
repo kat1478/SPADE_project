@@ -1,0 +1,13 @@
+# alg: f2
+# input: data/wyklad.csv
+# minsup: 2
+# format: pattern_len,num_elts,tidlist_len,sup,pattern
+pattern_len,num_elts,tidlist_len,sup,pattern
+1,2,4,3,<{A B}>
+1,2,4,3,<{A F}>
+1,2,4,4,<{B F}>
+2,2,3,2,<{B}->{A}>
+2,2,4,2,<{D}->{A}>
+2,2,3,2,<{D}->{B}>
+2,2,3,2,<{D}->{F}>
+2,2,2,2,<{F}->{A}>
