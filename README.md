@@ -90,7 +90,7 @@ Example:
 
 ### CSV format (toy dataset)
 
-For smaller datasets, CSV input is supported. The file should include columns like `sid` (sequence ID), `eid` (event ID), and item columns. See `data/toy_spade.csv` and `spade/io.py` for details.
+For smaller datasets, CSV input is supported. The file should include columns like `sid` (sequence ID), `eid` (event ID), and item columns. See `data/wyklad.csv` and `spade/io.py` for details.
 
 ---
 
@@ -103,6 +103,10 @@ Each line represents one frequent pattern, in discovery order:
 ```
 <pattern_length> <element_count> <tidlist_length> <support> <human_readable_pattern>
 ```
+
+The header is:
+**pattern_len,num_elts,tidlist_len,sup,pattern**
+Optionally, the file may start with comment metadata lines beginning with # (algorithm, input, minsup, dataset sizes). These lines can be ignored when parsing.
 
 Example:
 
@@ -117,7 +121,12 @@ Contains comprehensive experiment metadata:
 - Dataset statistics: number of sequences (D), transactions (T), items (I), and distribution metrics
 - Algorithm parameters: minimum support, optional maxElts limit, algorithm name
 - Execution times: reading, mining, writing, and total times
-- Performance counters: candidates explored, patterns discovered, max pattern length
+- Performance counters include:
+  - `total_discovered` — frequent patterns written to OUT
+  - `total_attempted_candidates` — join trials before minsup filtering
+  - `total_attempted_sum_tidlist_len` — proxy cost of joins (sum of tidlist lengths during attempted joins)
+  - `attempted_len_k` — per-length breakdown of attempted candidates
+  - max pattern length
 
 ---
 
@@ -149,6 +158,12 @@ python -m scripts.run_and_stat --input data/msnbc.spmf --alg maxelts-dspade --su
 python -m scripts.run_and_stat --input data/msnbc.spmf --alg maxelts-bspade --sup 200000 --maxElts 2 --resultsDir results_final
 ```
 
+**With garbage collection (useful for very large datasets / limited RAM):**
+
+```bash
+python -m scripts.run_and_stat --input data/msnbc.spmf --alg bspade --sup 200000 --resultsDir results_final --gc
+```
+
 The script prints the paths to generated files:
 
 ```
@@ -168,6 +183,17 @@ python -m scripts.run_grid \
   --maxElts 2,3
 ```
 
+**Grid search — all algorithms with garbage collection:**
+
+```bash
+python -m scripts.run_grid \
+  --input data/msnbc.spmf \
+  --resultsDir results_msnbc \
+  --sups 160000,200000,320000 \
+  --maxElts 2,3 \
+  --gc
+```
+
 **Grid search — maxElts variants only:**
 
 ```bash
@@ -176,6 +202,17 @@ python -m scripts.run_grid_maxelts \
   --resultsDir results_covid \
   --sups 420,450,480,495 \
   --maxElts 2,3
+```
+
+**Grid search — maxElts variants with garbage collection:**
+
+```bash
+python -m scripts.run_grid_maxelts \
+  --input data/covid.spmf \
+  --resultsDir results_covid \
+  --sups 420,450,480,495 \
+  --maxElts 2,3 \
+  --gc
 ```
 
 ---

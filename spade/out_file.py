@@ -28,19 +28,19 @@ def write_out(path: str, rows: Iterable[str], meta: Optional[OutMeta] = None) ->
     So the caller should pass rows already in CSV order OR pass space-separated and we convert.
     """
     with open(path, "w", encoding="utf-8") as f:
-        if meta is not None:
-            f.write(f"# alg: {meta.alg}\n")
-            f.write(f"# input: {meta.input_file}\n")
-            f.write(f"# minsup: {meta.minsup}\n")
-            if meta.max_elts is not None:
-                f.write(f"# max_elts: {meta.max_elts}\n")
-            if meta.num_sequences is not None:
-                f.write(f"# |D| (num_sequences): {meta.num_sequences}\n")
-            if meta.num_transactions is not None:
-                f.write(f"# |T| (num_transactions): {meta.num_transactions}\n")
-            if meta.num_items is not None:
-                f.write(f"# |I| (num_distinct_items): {meta.num_items}\n")
-            f.write("# format: pattern_len,num_elts,tidlist_len,sup,pattern\n")
+        # if meta is not None:
+        #     f.write(f"# alg: {meta.alg}\n")
+        #     f.write(f"# input: {meta.input_file}\n")
+        #     f.write(f"# minsup: {meta.minsup}\n")
+        #     if meta.max_elts is not None:
+        #         f.write(f"# max_elts: {meta.max_elts}\n")
+        #     if meta.num_sequences is not None:
+        #         f.write(f"# |D| (num_sequences): {meta.num_sequences}\n")
+        #     if meta.num_transactions is not None:
+        #         f.write(f"# |T| (num_transactions): {meta.num_transactions}\n")
+        #     if meta.num_items is not None:
+        #         f.write(f"# |I| (num_distinct_items): {meta.num_items}\n")
+        #     f.write("# format: pattern_len,num_elts,tidlist_len,sup,pattern\n")
 
         # CSV header
         f.write(",".join(OUT_COLUMNS) + "\n")

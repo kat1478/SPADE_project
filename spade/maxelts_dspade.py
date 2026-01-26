@@ -10,6 +10,8 @@ from .candidates import join_in_class
 from .dspade import StatsCounter
 from .f2 import gen_f2
 
+import gc
+
 
 def _group_by_prefix(nodes: List[Node]) -> Dict[Pattern, List[Node]]:
     classes: Dict[Pattern, List[Node]] = defaultdict(list)
@@ -80,7 +82,7 @@ def maxelts_dspade(
         next_level: List[Node] = []
         for i in range(len(class_nodes)):
             for j in range(i + 1, len(class_nodes)):
-                cand = join_in_class(class_nodes[i], class_nodes[j], minsup)
+                cand = join_in_class(class_nodes[i], class_nodes[j], minsup, stats=stats)
                 # filter max_elts
                 cand = [c for c in cand if c.elts <= max_elts]
                 if stats:
@@ -110,6 +112,9 @@ def maxelts_dspade(
         sub = _group_by_prefix(next_level)
         for _pref, sub_nodes in sub.items():
             recurse(sub_nodes)
+
+        if stats is not None and getattr(stats, "gc_enabled", False):
+            gc.collect()
 
     for _pref, cls in classes.items():
         recurse(cls)

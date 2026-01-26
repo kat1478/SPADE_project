@@ -1,7 +1,3 @@
-# alg: f1
-# input: data/wyklad.csv
-# minsup: 2
-# format: pattern_len,num_elts,tidlist_len,sup,pattern
 pattern_len,num_elts,tidlist_len,sup,pattern
 1,1,6,4,<{A}>
 1,1,5,4,<{B}>

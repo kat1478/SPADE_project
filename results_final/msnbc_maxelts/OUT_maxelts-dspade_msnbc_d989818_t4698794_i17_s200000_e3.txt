@@ -1,0 +1,3 @@
+pattern_len,num_elts,tidlist_len,sup,pattern
+1,1,940469,313181,<{1}>
+1,1,414928,217101,<{6}>

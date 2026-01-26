@@ -9,6 +9,8 @@ from .pattern_utils import split_last_step, pattern_sort_key
 from .candidates import join_in_class
 from .f2 import gen_f2
 
+import gc
+
 
 class StatsCounter:
     def __init__(self):
@@ -21,6 +23,11 @@ class StatsCounter:
 
         self.max_candidate_len = 0
         self.max_discovered_len = 0
+
+        #attempted candidates = generated before minsup filtering
+        self.attempted_by_len = {}
+        self.sum_tid_attempted = {}
+
 
     def _inc(self, d, k, v=1):
         d[k] = d.get(k, 0) + v
@@ -41,6 +48,13 @@ class StatsCounter:
         self._inc(self.sum_sup_disc, k, node.sup)
         self._inc(self.sum_tid_disc, k, node.len_tidlist)
 
+    def add_attempted(self, k: int, tidlist_len: int):
+        if k > self.max_candidate_len:
+            self.max_candidate_len = k
+        self._inc(self.attempted_by_len, k, 1)
+        self._inc(self.sum_tid_attempted, k, tidlist_len)
+
+
     def total_candidates(self) -> int:
         return sum(self.candidates_by_len.values())
 
@@ -58,6 +72,13 @@ class StatsCounter:
 
     def total_sum_tid_discovered(self) -> int:
         return sum(self.sum_tid_disc.values())
+    
+    def total_attempted(self) -> int:
+        return sum(self.attempted_by_len.values())
+    
+    def total_sum_tid_attempted(self) -> int:
+        return sum(self.sum_tid_attempted.values())
+
 
 
 def _group_by_prefix(nodes: List[Node]) -> Dict[Pattern, List[Node]]:
@@ -126,7 +147,7 @@ def dspade(
         next_level: List[Node] = []
         for i in range(len(class_nodes)):
             for j in range(i + 1, len(class_nodes)):
-                cand = join_in_class(class_nodes[i], class_nodes[j], minsup)
+                cand = join_in_class(class_nodes[i], class_nodes[j], minsup, stats=stats)
                 if stats:
                     for c in cand:
                         stats.add_candidate(c)
@@ -147,6 +168,10 @@ def dspade(
         sub = _group_by_prefix(next_level)
         for _pref, sub_nodes in sub.items():
             recurse(sub_nodes)
+
+        # GC checkpoint: end of DFS class
+        if stats is not None and getattr(stats, "gc_enabled", False):
+            gc.collect()
 
     for _pref, cls in classes.items():
         recurse(cls)

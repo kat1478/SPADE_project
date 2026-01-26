@@ -65,6 +65,11 @@ def write_stat(
     lines.append(f"total_discovered_sum_sup: {stats_counter.total_sum_sup_discovered()}")
     lines.append(f"total_discovered_sum_tidlist_len: {stats_counter.total_sum_tid_discovered()}")
 
+    # --- attempted candidates (before minsup filtering)
+    lines.append(f"total_attempted_candidates: {stats_counter.total_attempted()}")
+    lines.append(f"total_attempted_sum_tidlist_len: {stats_counter.total_sum_tid_attempted()}")
+
+
     # --- per length 1..max_discovered_len (+1 for candidates of length L+1)
     L = stats_counter.max_discovered_len
     for k in range(1, L + 2):
@@ -84,6 +89,12 @@ def write_stat(
         lines.append(f"discovered_len_{k}: {disc}")
         lines.append(f"discovered_len_{k}_sum_sup: {disc_sup}")
         lines.append(f"discovered_len_{k}_sum_tidlist_len: {disc_tid}")
+
+        att = stats_counter.attempted_by_len.get(k, 0)
+        att_tid = stats_counter.sum_tid_attempted.get(k, 0)
+        lines.append(f"attempted_len_{k}: {att}")
+        lines.append(f"attempted_len_{k}_sum_tidlist_len: {att_tid}")
+
 
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")

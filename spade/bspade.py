@@ -10,6 +10,8 @@ from .candidates import join_in_class
 from .dspade import StatsCounter
 from .f2 import gen_f2
 
+import gc
+
 
 def _group_by_prefix(nodes: List[Node]) -> Dict[Pattern, List[Node]]:
     classes: Dict[Pattern, List[Node]] = defaultdict(list)
@@ -77,7 +79,7 @@ def bspade(
         for _pref, cls_nodes in current_classes.items():
             for i in range(len(cls_nodes)):
                 for j in range(i + 1, len(cls_nodes)):
-                    cand = join_in_class(cls_nodes[i], cls_nodes[j], minsup)
+                    cand = join_in_class(cls_nodes[i], cls_nodes[j], minsup, stats=stats)
                     if stats:
                         for c in cand:
                             stats.add_candidate(c)
@@ -101,6 +103,10 @@ def bspade(
                 on_discover(n)
             if stats:
                 stats.add_discovered(n)
+
+        # GC checkpoint: end of BFS level
+        if stats is not None and getattr(stats, "gc_enabled", False):
+            gc.collect()
 
         # group to next classes
         current_classes = _group_by_prefix(next_level_nodes)

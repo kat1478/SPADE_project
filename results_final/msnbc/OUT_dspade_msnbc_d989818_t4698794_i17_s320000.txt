@@ -1,0 +1,1 @@
+pattern_len,num_elts,tidlist_len,sup,pattern

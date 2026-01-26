@@ -6,7 +6,7 @@ from .pattern_utils import split_last_step, pattern_sort_key
 from .join import i_join, s_join
 
 
-def join_in_class(a: Node, b: Node, minsup: int) -> List[Node]:
+def join_in_class(a: Node, b: Node, minsup: int, stats=None) -> List[Node]:
     """
     Join two nodes that MUST belong to the same equivalence class (same prefix).
     Generates (k+1)-candidates according to SPADE cases:
@@ -22,6 +22,12 @@ def join_in_class(a: Node, b: Node, minsup: int) -> List[Node]:
     out: List[Node] = []
 
     def emit(pat: Pattern, tl):
+        # attempted candidate (before minsup)
+        if stats is not None:
+            # length is number of events in pattern
+            k = len(pat)
+            stats.add_attempted(k, len(tl))
+
         # avoid extra work: compute sup via Node.sup property
         n = Node(pattern=pat, tidlist=tl)
         if n.sup >= minsup:
