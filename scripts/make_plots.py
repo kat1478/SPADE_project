@@ -16,7 +16,7 @@ plt.rcParams.update({
 INT_KEYS = {
     "sup", "maxElts",
     "total_discovered",
-    "total_candidates",  # legacy (może się jeszcze pojawić)
+    "total_candidates", 
     "total_attempted_candidates",
     "total_attempted_sum_tidlist_len",
     "max_discovered_length", "max_candidate_length",
