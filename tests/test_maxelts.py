@@ -11,7 +11,7 @@ def to_set(nodes):
     return {n.pattern for n in nodes}
 
 def prepare():
-    records = read_csv("data/toy_spade.csv")
+    records = read_csv("data/wyklad.csv")
     vdb = build_vertical_db(records)
     f1 = frequent_items(vdb, minsup=2)
     item_tidlists = {it: tl for (it, tl, _) in f1}

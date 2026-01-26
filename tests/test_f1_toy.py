@@ -3,7 +3,7 @@ from spade.vertical import build_vertical_db, support
 from spade.f1 import frequent_items
 
 def test_f1_toy_sup2():
-    records = read_csv("data/toy_spade.csv")
+    records = read_csv("data/wyklad.csv")
     vdb = build_vertical_db(records)
 
     f1 = frequent_items(vdb, minsup=2)
