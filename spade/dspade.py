@@ -20,13 +20,11 @@ class StatsCounter:
         self.sum_tid_cand = {}
         self.sum_sup_disc = {}
         self.sum_tid_disc = {}
-
         self.max_candidate_len = 0
         self.max_discovered_len = 0
-
-        #attempted candidates = generated before minsup filtering
         self.attempted_by_len = {}
         self.sum_tid_attempted = {}
+        self.gc_enabled = False
 
 
     def _inc(self, d, k, v=1):
@@ -95,14 +93,12 @@ def _group_by_prefix(nodes: List[Node]) -> Dict[Pattern, List[Node]]:
     return dict(sorted(classes.items(), key=lambda kv: pattern_sort_key(kv[0])))
 
 
-def _f1_nodes_to_f2_nodes(f1_nodes: List[Node], minsup: int) -> List[Node]:
-    # convert Node((item,), tidlist) to tuples expected by gen_f2
+def _f1_nodes_to_f2_nodes(f1_nodes: List[Node], minsup: int, stats: StatsCounter | None = None) -> List[Node]:
     f1_tuples: List[Tuple[str, List[Tid], int]] = []
     for n in sorted(f1_nodes, key=lambda x: x.pattern[0][0]):
         item = n.pattern[0][0]
         f1_tuples.append((item, n.tidlist, n.sup))
-
-    f2 = gen_f2(f1_tuples, minsup)
+    f2 = gen_f2(f1_tuples, minsup, stats=stats)
     return [Node(pattern=p, tidlist=tl) for (p, tl, _sup) in f2]
 
 
@@ -122,23 +118,19 @@ def dspade(
     # record F1
     for n in sorted(f1_nodes, key=lambda x: pattern_sort_key(x.pattern)):
         if stats:
+            stats.add_attempted(n.length, n.len_tidlist)
             stats.add_candidate(n)
         discovered.append(n)
-        if on_discover:
-            on_discover(n)
-        if stats:
-            stats.add_discovered(n)
+        if on_discover: on_discover(n)
+        if stats: stats.add_discovered(n)
 
     # build & record F2
-    f2_nodes = _f1_nodes_to_f2_nodes(f1_nodes, minsup)
+    f2_nodes = _f1_nodes_to_f2_nodes(f1_nodes, minsup, stats=stats)
     for n in sorted(f2_nodes, key=lambda x: pattern_sort_key(x.pattern)):
-        if stats:
-            stats.add_candidate(n)
+        if stats: stats.add_candidate(n)
         discovered.append(n)
-        if on_discover:
-            on_discover(n)
-        if stats:
-            stats.add_discovered(n)
+        if on_discover: on_discover(n)
+        if stats: stats.add_discovered(n)
 
     classes = _group_by_prefix(f2_nodes)
 
@@ -170,7 +162,7 @@ def dspade(
             recurse(sub_nodes)
 
         # GC checkpoint: end of DFS class
-        if stats is not None and getattr(stats, "gc_enabled", False):
+        if stats is not None and stats.gc_enabled:
             gc.collect()
 
     for _pref, cls in classes.items():

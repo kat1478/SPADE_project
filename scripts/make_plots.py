@@ -202,9 +202,9 @@ def main():
     print("Writing plots to:", outdir.resolve())
 
     
-    msnbc_folders = ["results_final/msnbc", "results_final/msnbc_maxelts"]  
-    bike_folders = ["results_final/bike"]
-    covid_folders = ["results_final/covid"]
+    msnbc_folders = ["results/results_final/msnbc", "results/results_final/msnbc_maxelts"]  
+    bike_folders = ["results/results_final/bike"]
+    covid_folders = ["results/results_final/covid"]
 
     # Load
     msnbc = merge_stats(*msnbc_folders)

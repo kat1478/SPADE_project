@@ -12,11 +12,11 @@ items_per_tx_mean: 1.000000
 items_per_tx_std: 0.000000
 alg: dspade
 sup: 320000
-time_read_s: 27.271327
-time_mine_s: 0.009429
-time_write_s: 0.007488
-total_time_minus_read_s: 2.705247
-total_time_s: 29.976575
+time_read_s: 26.389804
+time_mine_s: 0.007726
+time_write_s: 0.015951
+total_time_minus_read_s: 2.581836
+total_time_s: 28.971640
 max_candidate_length: 0
 max_discovered_length: 0
 total_candidates: 0

@@ -12,11 +12,11 @@ items_per_tx_mean: 1.000000
 items_per_tx_std: 0.000000
 alg: bspade
 sup: 320000
-time_read_s: 27.659679
-time_mine_s: 0.009476
-time_write_s: 0.008154
-total_time_minus_read_s: 2.510185
-total_time_s: 30.169864
+time_read_s: 26.016069
+time_mine_s: 0.006336
+time_write_s: 0.006259
+total_time_minus_read_s: 2.975668
+total_time_s: 28.991736
 max_candidate_length: 0
 max_discovered_length: 0
 total_candidates: 0

@@ -24,7 +24,8 @@ def read_csv(path: str) -> List[Record]:
             raw_items = row["items"].strip()
             if not raw_items:
                 raise ValueError(f"Empty items in row: {row}")
-            items = tuple(sorted(set(raw_items.split())))
+            # items = tuple(sorted(set(raw_items.split())))         # old version, split by whitespace
+            items = tuple(sorted(set(list(raw_items))))             # new version, each character is an item
             records.append(Record(sid=sid, eid=eid, items=items))
 
     records.sort(key=lambda r: (r.sid, r.eid))
